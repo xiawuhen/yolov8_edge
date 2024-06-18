@@ -111,7 +111,7 @@ class DetThread2(QThread):
                 person_count = json_data['Person_count']
                 classes = json_data['Calsses']
                 image = json_data['Image']
-                ip='http://192.168.1.101:8000/'
+
                 image_ip=ip+image
 
                 if classes==2:
@@ -275,10 +275,6 @@ class MainWindow(QMainWindow, Ui_mainWindow):
     def show_msg(self, msg):
         self.runButton.setChecked(Qt.Unchecked)#未开启三态模式设置选中状态，默认为未选中，true为选中  Qt.Unchecked为未选中
         self.statistic_msg(msg)#进行展示
-    def change_model(self, x):
-        self.model_type = self.comboBox.currentText()#获取当前选择的模型名字
-        self.det_thread.weights = "./pt/%s" % self.model_type#改变线程中weights名字
-        self.statistic_msg('模型切换为%s' % x)#对切换模型进行输出
     def max_or_restore(self):#界面放大
         if self.maxButton.isChecked():
             self.showFullScreen()
@@ -366,7 +362,7 @@ class UdpClient:
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
+    ip = 'http://192.168.1.101:8000/'
     # 指定目标 IP 和端口
     target_ip = "192.168.1.101"  # 本地 IP 地址，替换为目标 IP 地址
     target_port = 11451  # 目标端口，替换为目标端口
@@ -374,8 +370,5 @@ if __name__ == "__main__":
     client = UdpClient(target_ip, target_port)
     myWin = MainWindow()
     myWin.show()
-
-
-
 
     sys.exit(app.exec_())
