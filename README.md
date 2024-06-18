@@ -20,15 +20,22 @@
 ## 安装说明
 
 ### 环境配置
-确保你已安装Python 3.8以上版本，并安装以下依赖包：
-pip install -r requirements.txt
-requirements.txt 文件内容如下：
 
+确保已安装Python 3.8以上版本，并安装以下依赖包：
+
+```bash
+pip install -r requirements.txt
+```
+
+`requirements.txt` 文件内容如下：
+
+```
 PyQt5==5.15.4
 openpyxl==3.0.7
 numpy==1.19.5
 requests==2.25.1
 opencv-python==4.5.1.48
+```
 
 ### 项目结构
 
@@ -44,6 +51,7 @@ opencv-python==4.5.1.48
 
 确保已安装 MySQL，并创建相应的数据库和表。运行以下命令创建数据库：
 
+```sql
 CREATE DATABASE record;
 USE record;
 
@@ -67,15 +75,78 @@ CREATE TABLE records_sum (
     sh INT NOT NULL,
     svh INT NOT NULL
 );
-
 ```
+
 ## 配置数据库连接
+
+在 `db.py` 文件中设置数据库连接参数：
+
+```python
 host = "localhost"
 user = "root"
 password = "123456789"
 database = "record"
+```
 
+`db.py` 文件的内容如下：
 
+```python
+import pymysql
+import traceback
+
+def get_conn(database):
+    """
+    链接数据库
+    :param database: 数据库名字
+    :return: 连接，游标
+    """
+    conn = pymysql.connect(
+        host="localhost",
+        user="root",
+        password="123456789",
+        db=database,
+    )
+    cursor = conn.cursor()  # 执行完毕返回的结果集默认以元组显示
+    return conn, cursor
+
+def close_conn(conn, cursor):
+    """
+    关闭链接
+    :param conn:
+    :param cursor:
+    :return:
+    """
+    if cursor:
+        cursor.close()
+    if conn:
+        conn.close()
+
+def query(sql, database, *args):
+    """
+    封装通用查询
+    :param sql: SQL语句
+    :param database: 数据库名字
+    :param args: 参数
+    :return: 返回查询到的结果，((),(),)的形式
+    """
+    conn, cursor = get_conn(database)
+    cursor.execute(sql, args)
+    res = cursor.fetchall()
+    close_conn(conn, cursor)
+    return res
+
+def exec_(sql, database):
+    cursor = None
+    conn = None
+    try:
+        conn, cursor = get_conn(database)
+        cursor.execute(sql)
+        conn.commit()  # 提交事务 update delete insert操作
+    except:
+        traceback.print_exc()
+    finally:
+        close_conn(conn, cursor)
+```
 
 ## 使用说明
 
