@@ -40,11 +40,22 @@ opencv-python==4.5.1.48
 ### 项目结构
 
 ```
-├── db.py                   # 数据库操作模块
-├── main.py                 # 主程序入口
-├── ui_mainwindow.py        # 通过Qt Designer生成的UI代码
-├── resources               # 资源文件（图片、视频等）
-└── README.md               # 项目说明文件
+yolov8_edge/
+│
+├── main.py                     # 主程序入口
+├── db.py                       # 数据库操作模块
+├── utils/
+│   ├── datasets.py             # 数据集加载模块
+│   └── CustomMessageBox.py     # 自定义消息框
+├── dialog/
+│   └── rtsp_win.py             # RTSP 地址输入窗口
+├── main_win/
+│   └── win5.py                 # 主窗口 UI
+├── config/
+│   └── ip.json                 # 存放 RTSP 地址的配置文件
+├── requirements.txt            # 项目依赖文件
+└── README.md                   # 项目说明文件
+
 ```
 
 ## 配置数据库
@@ -88,64 +99,15 @@ password = "123456789"
 database = "record"
 ```
 
-`db.py` 文件的内容如下：
+## 配置IP地址和端口
+
+在 `main.py` 文件中设置你的IP地址和端口：
 
 ```python
-import pymysql
-import traceback
-
-def get_conn(database):
-    """
-    链接数据库
-    :param database: 数据库名字
-    :return: 连接，游标
-    """
-    conn = pymysql.connect(
-        host="localhost",
-        user="root",
-        password="123456789",
-        db=database,
-    )
-    cursor = conn.cursor()  # 执行完毕返回的结果集默认以元组显示
-    return conn, cursor
-
-def close_conn(conn, cursor):
-    """
-    关闭链接
-    :param conn:
-    :param cursor:
-    :return:
-    """
-    if cursor:
-        cursor.close()
-    if conn:
-        conn.close()
-
-def query(sql, database, *args):
-    """
-    封装通用查询
-    :param sql: SQL语句
-    :param database: 数据库名字
-    :param args: 参数
-    :return: 返回查询到的结果，((),(),)的形式
-    """
-    conn, cursor = get_conn(database)
-    cursor.execute(sql, args)
-    res = cursor.fetchall()
-    close_conn(conn, cursor)
-    return res
-
-def exec_(sql, database):
-    cursor = None
-    conn = None
-    try:
-        conn, cursor = get_conn(database)
-        cursor.execute(sql)
-        conn.commit()  # 提交事务 update delete insert操作
-    except:
-        traceback.print_exc()
-    finally:
-        close_conn(conn, cursor)
+# 替换为你的本地 IP 地址和目标端口
+ip = 'http://192.168.1.101:8000/'
+target_ip = "192.168.1.101"
+target_port = 11451
 ```
 
 ## 使用说明
